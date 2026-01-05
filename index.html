@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Number Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    #output { margin: 20px 0; font-size: 24px; font-weight: bold; }
+    button { padding: 10px 20px; font-size: 18px; margin: 10px; }
+    canvas { max-height: 400px; }
+  </style>
+</head>
+<body>
+  <h1>Voice Number Tracker</h1>
+  <p>Click the mic, speak a number (e.g., "one hundred twenty three"), and it stores with today's date. Reload to see persistence.</p>
+  <button id="startBtn">🎤 Start Voice Input</button>
+  <div id="output">Speak a number...</div>
+  <canvas id="chart"></canvas>
+
+  <script>
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+    const output = document.getElementById('output');
+    const startBtn = document.getElementById('startBtn');
+    let chart;
+
+    const numWords = {
+      'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9,
+      'ten': 10, 'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15, 'sixteen': 16,
+      'seventeen': 17, 'eighteen': 18, 'nineteen': 19, 'twenty': 20, 'thirty': 30, 'forty': 40, 'fifty': 50,
+      'sixty': 60, 'seventy': 70, 'eighty': 80, 'ninety': 90, 'hundred': 100, 'thousand': 1000
+    };
+
+    function wordsToNumber(text) {
+      text = text.toLowerCase().replace(/ and /g, ' ').trim();
+      let total = 0, current = 0;
+      text.split(/\s+/).forEach(word => {
+        if (word in numWords) {
+          const val = numWords[word];
+          if (val === 100) current *= 100;
+          else if (val === 1000) current *= 1000;
+          else {
+            current += val;
+            total += current;
+            current = 0;
+          }
+        }
+      });
+      return total || parseFloat(text) || 0;
+    } [web:39]
+
+    function loadData() {
+      const data = localStorage.getItem('numbers');
+      return data ? JSON.parse(data) : {};
+    }
+
+    function saveData(data) {
+      localStorage.setItem('numbers', JSON.stringify(data));
+      updateChart();
+    }
+
+    function updateChart() {
+      const data = loadData();
+      const labels = Object.keys(data).sort();
+      const values = labels.map(date => data[date]);
+      const ctx = document.getElementById('chart').getContext('2d');
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: labels.map(d => new Date(d)), datasets: [{ label: 'Number', data: values, borderColor: 'blue', fill: false }] },
+        options: {
+          scales: { x: { type: 'time', time: { unit: 'day' } } }
+        }
+      }); [web:17][web:20][web:26][web:34]
+    }
+
+    if (recognition) {
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        const num = wordsToNumber(transcript);
+        if (num > 0) {
+          const today = new Date().toISOString().split('T')[0];
+          const data = loadData();
+          data[today] = num;
+          saveData(data);
+          output.textContent = `Stored ${num} for ${today}`;
+        } else {
+          output.textContent = `Invalid number from "${transcript}". Try again.`;
+        }
+      };
+      recognition.onerror = () => { output.textContent = 'Voice error. Try again.'; };
+      startBtn.onclick = () => recognition.start();
+    } else {
+      startBtn.disabled = true;
+      output.textContent = 'SpeechRecognition not supported. Use text input or Chrome.';
+    } [web:12][web:13][web:14]
+
+    updateChart(); [conversation_history:6][conversation_history:10][memory:3]
+  </script>
+</body>
+</html>
