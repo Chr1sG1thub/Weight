@@ -50,7 +50,7 @@
         }
       });
       return total || parseFloat(text) || 0;
-    } [web:39]
+    }
 
     function loadData() {
       const data = localStorage.getItem('numbers');
@@ -74,7 +74,7 @@
         options: {
           scales: { x: { type: 'time', time: { unit: 'day' } } }
         }
-      }); [web:17][web:20][web:26][web:34]
+      });
     }
 
     if (recognition) {
@@ -99,7 +99,7 @@
     } else {
       startBtn.disabled = true;
       output.textContent = 'SpeechRecognition not supported. Use text input or Chrome.';
-    } [web:12][web:13][web:14]
+    }
 
     updateChart(); [conversation_history:6][conversation_history:10][memory:3]
   </script>
