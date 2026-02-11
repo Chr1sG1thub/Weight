@@ -69,7 +69,7 @@ const mostRecentValue = Object.entries(data)
   .reduce((best, cur) => new Date(cur[0]) > new Date(best[0]) ? cur : best)[1];
 
     const prev = document.getElementById('prev');
-prev.textContent = "Previous Weight: " + mostRecentValue.toFixed(1) + "kg"      
+prev.textContent = "Previous Weight: " + mostRecentValue.toFixed(1) + "kg";     
       
       const labels = Object.keys(data).sort();
       const values = labels.map(date => data[date]);
