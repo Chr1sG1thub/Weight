@@ -63,11 +63,9 @@
 
     function updateChart() {
       const data = loadData();
-      const mostRecentPair = data.reduce((best, cur) =>
-  cur[0] > best[0] ? cur : best
-);
-
-const mostRecentValue = mostRecentPair[1];
+      
+const mostRecentValue = Object.entries(data)
+  .reduce((best, cur) => new Date(cur[0]) > new Date(best[0]) ? cur : best)[1];
       
       const labels = Object.keys(data).sort();
       const values = labels.map(date => data[date]);
