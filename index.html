@@ -17,6 +17,7 @@
   <h1>Weight Tracker</h1>
   <button id="startBtn">🎤 Start Voice Input</button>
   <div id="output">Say your weight in kilos.</div>
+  <div id="prev">&nbsp;</div>
   <canvas id="chart"></canvas>
 
   <script>
@@ -66,6 +67,9 @@
       
 const mostRecentValue = Object.entries(data)
   .reduce((best, cur) => new Date(cur[0]) > new Date(best[0]) ? cur : best)[1];
+
+    const prev = document.getElementById('prev');
+prev.textContent = "Previous Weight: " + mostRecentValue.toFixed(1) + "kg"      
       
       const labels = Object.keys(data).sort();
       const values = labels.map(date => data[date]);
